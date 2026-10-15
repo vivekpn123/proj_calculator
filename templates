@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colourful Calculator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif;color:#242044;background:radial-gradient(circle at 15% 15%,#ffd6e7,transparent 32%),radial-gradient(circle at 85% 20%,#c8f7ff,transparent 30%),linear-gradient(135deg,#f6e7ff,#e7f8ff 55%,#fff3d6)}
+.card{width:min(100%,440px);padding:30px;border-radius:28px;background:#ffffffd9;border:1px solid white;box-shadow:0 24px 70px #4a358229}
+.eyebrow{color:#7d5bd6;font-weight:800;letter-spacing:.13em;font-size:.75rem;text-transform:uppercase}h1{margin:8px 0;font-size:clamp(2rem,7vw,2.6rem);letter-spacing:-.05em}.subtitle{margin:0 0 24px;color:#696985;line-height:1.5}
+label{display:block;margin:14px 0 7px;font-weight:700;font-size:.9rem}input{width:100%;padding:14px 15px;border:1px solid #dedcf0;border-radius:14px;background:white;font:inherit;outline:none}input:focus{border-color:#9274ef;box-shadow:0 0 0 4px #9274ef22}
+.operations{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:20px 0}button{border:0;cursor:pointer;font:inherit;font-weight:800;transition:transform .12s}button:hover{transform:translateY(-2px)}.op{padding:13px 0;border-radius:13px;color:white;font-size:1.15rem}.op[data-op=add]{background:linear-gradient(135deg,#ff7b9c,#ff5578)}.op[data-op=subtract]{background:linear-gradient(135deg,#ffbd69,#ff8d53)}.op[data-op=multiply]{background:linear-gradient(135deg,#48c9b0,#20a9a1)}.op[data-op=divide]{background:linear-gradient(135deg,#8e7bff,#6554d9)}.op.selected{outline:3px solid #28234d;outline-offset:2px}
+.calculate{width:100%;padding:15px;border-radius:15px;color:white;background:#25224b}.result{margin-top:18px;padding:18px;border-radius:17px;background:linear-gradient(120deg,#f0eaff,#e6faff)}.result small{display:block;color:#6d688e;font-weight:700}#answer{font-size:2rem;font-weight:900;overflow-wrap:anywhere}#message{min-height:1.3em;color:#bf3158;font-size:.9rem;margin:8px 0 0}footer{margin-top:20px;text-align:center;font-size:.78rem;color:#85819f}
+</style></head>
+<body><main class="card"><div class="eyebrow">Simple math · Bright ideas</div><h1>Colourful Calculator</h1><p class="subtitle">Four operations, one little place. Enter your numbers and choose an operation.</p>
+<label for="a">First number</label><input id="a" type="number" step="any" value="24" placeholder="e.g. 24">
+<label for="b">Second number</label><input id="b" type="number" step="any" value="6" placeholder="e.g. 6">
+<div class="operations" aria-label="Choose operation"><button class="op selected" data-op="add" aria-label="Add">+</button><button class="op" data-op="subtract" aria-label="Subtract">−</button><button class="op" data-op="multiply" aria-label="Multiply">×</button><button class="op" data-op="divide" aria-label="Divide">÷</button></div>
+<button class="calculate" id="calculate">Calculate result →</button><div class="result" aria-live="polite"><small>YOUR ANSWER</small><div id="answer">30</div><p id="message" role="alert"></p></div><footer>Built with Flask · Tested with pytest</footer></main>
+<script>
+let operation="add";const answer=document.getElementById("answer"),message=document.getElementById("message");
+document.querySelectorAll(".op").forEach(button=>button.addEventListener("click",()=>{operation=button.dataset.op;document.querySelectorAll(".op").forEach(item=>item.classList.toggle("selected",item===button))}));
+document.getElementById("calculate").addEventListener("click",async()=>{message.textContent="";const a=document.getElementById("a").value,b=document.getElementById("b").value;if(a.trim()===""||b.trim()===""){message.textContent="Please enter both numbers.";return}try{const response=await fetch("/calculate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({a,b,op:operation})});const data=await response.json();if(!response.ok)throw new Error(data.error||"Calculation failed.");answer.textContent=data.result}catch(error){message.textContent=error.message}});
+</script></body></html>
